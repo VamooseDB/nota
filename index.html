@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nota Sahabat Abadi - High Fidelity</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0;
+    padding: 0;
+    background: #e2e8f0;
+    font-family: Arial, Helvetica, sans-serif;
+    width: 100%;
+  }
+  .page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  .toolbar {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 580px;
+  }
+  .btn {
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    border-radius: 8px;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    flex: 1;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+  .btn-dark { background: #1e293b; color: #fff; }
+  .btn-red { background: #cc2424; color: #fff; }
+  .btn:hover { opacity: 0.9; }
+  .btn svg { width: 18px; height: 18px; }
+
+  /* ---------------- NOTA CONTAINER ---------------- */
+  #nota-frame {
+    background: #ffffff;
+    width: 580px;
+    padding: 25px 30px;
+    position: relative;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    color: #cc2424;
+  }
+
+  /* ---------------- HEADER ---------------- */
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+  .brand-section {
+    width: 55%;
+  }
+  .brand-title {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+  .brand-subtitle {
+    font-size: 12px;
+    font-weight: bold;
+    gest-style: italic;
+    font-style: italic;
+    margin: 3px 0 6px 0;
+  }
+  .brand-address {
+    font-size: 10.5px;
+    font-weight: bold;
+    line-height: 1.4;
+    margin: 0;
+  }
+
+  .meta-section {
+    width: 42%;
+    font-size: 12px;
+    font-weight: bold;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-top: 5px;
+  }
+  .meta-row {
+    display: flex;
+    align-items: flex-end;
+  }
+  .meta-row input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    color: #000;
+    font-size: 12px;
+    padding: 0 0 0 4px;
+    outline: none;
+  }
+  .meta-dots {
+    flex: 1;
+    border-bottom: 1px dotted #cc2424;
+    position: relative;
+    display: flex;
+    align-items: flex-end;
+  }
+  .customer-header {
+    text-align: center;
+    margin-left: 40px;
+    margin-bottom: 2px;
+  }
+
+  /* ---------------- NOTA NUMBER LINE ---------------- */
+  .nota-no-container {
+    margin: 15px 0 10px 0;
+    font-size: 13px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+  }
+  .nota-no-line {
+    width: 220px;
+    border-bottom: 1px dotted #cc2424;
+    margin-left: 6px;
+    display: flex;
+  }
+  .nota-no-line input {
+    width: 100%;
+    border: none;
+    background: transparent;
+    outline: none;
+    color: #000;
+    font-size: 13px;
+    padding: 0 5px;
+  }
+
+  /* ---------------- TABLE ---------------- */
+  .tbl {
+    border: 1.5px solid #cc2424;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  .tbl-head {
+    display: grid;
+    grid-template-columns: 65px 1fr 100px 110px;
+    border-bottom: 1.5px solid #cc2424;
+    text-align: center;
+    font-weight: bold;
+    font-size: 11px;
+    background: rgba(204, 36, 36, 0.03);
+  }
+  .tbl-head > div {
+    border-right: 1.5px solid #cc2424;
+    padding: 6px 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tbl-head > div:last-child { border-right: none; }
+
+  .tbl-row {
+    display: grid;
+    grid-template-columns: 65px 1fr 100px 110px;
+    border-bottom: 1px solid #cc2424;
+    height: 26px;
+  }
+  .tbl-row:last-child { border-bottom: none; }
+  .tbl-row > div {
+    border-right: 1.5px solid #cc2424;
+    display: flex;
+    align-items: center;
+    position: relative;
+  }
+  .tbl-row > div:last-child { border-right: none; }
+  
+  .cell-qty input { text-align: center; }
+  .cell-price input { text-align: right; padding-right: 6px; }
+  .cell-name input { text-transform: uppercase; padding-left: 6px; }
+  
+  .tbl-row input {
+    width: 100%;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #000;
+    font-size: 12px;
+  }
+  .cell-jumlah {
+    justify-content: flex-end !important;
+    padding-right: 6px;
+    color: #000;
+    font-size: 12px;
+    font-weight: bold;
+  }
+
+  /* ---------------- FOOTER ---------------- */
+  .footer-container {
+    display: grid;
+    grid-template-columns: 1fr 210px;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: bold;
+  }
+  .tanda-terima-box {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-left: 30px;
+    padding-top: 5px;
+  }
+  .hormat-kami-box {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 5px;
+    height: 85px;
+  }
+  .signature-line {
+    font-size: 11px;
+  }
+
+  .right-footer-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .total-row {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    font-style: italic;
+    font-size: 13px;
+  }
+  .total-box {
+    border: 1.5px solid #cc2424;
+    width: 110px;
+    height: 28px;
+    margin-left: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 6px;
+    color: #000;
+    font-style: normal;
+    font-weight: bold;
+  }
+
+  /* ---------------- PERHATIAN BOX ---------------- */
+  .perhatian-box {
+    border: 1.5px solid #cc2424;
+    margin: 15px auto 0 auto;
+    padding: 4px 10px;
+    text-align: center;
+    width: 320px;
+    line-height: 1.3;
+  }
+  .perhatian-title {
+    font-size: 10.5px;
+    font-weight: 900;
+    text-transform: uppercase;
+    font-style: italic;
+    margin: 0;
+  }
+  .perhatian-text {
+    font-size: 9.5px;
+    font-weight: bold;
+    font-style: italic;
+    margin: 0;
+  }
+
+  /* ---------------- MODAL QR ---------------- */
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal-box {
+    background: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  }
+  #qrcode-container { margin: 15px 0; }
+  .close-btn {
+    background: #e2e8f0;
+    border: none;
+    padding: 6px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="toolbar">
+    <button class="btn btn-dark" id="downloadBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PNG
+    </button>
+    <button class="btn btn-red" id="qrBtn">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><path d="M14 14h7v7h-7z"/></svg>
+      Generate QR
+    </button>
+  </div>
+
+  <div id="nota-frame">
+    <div class="header-container">
+      <div class="brand-section">
+        <h1 class="brand-title">SAHABAT ABADI!</h1>
+        <p class="brand-subtitle">ALAT-ALAT LISTRIK &amp; TEKNIK</p>
+        <p class="brand-address">
+          Jl. Raya Sawangan No. 9 Rt 04 / Rw 03<br>
+          Kel. Rangkapan Jaya Baru<br>
+          Kec. Pancoran Mas DEPOK 16434
+        </p>
+      </div>
+      
+      <div class="meta-section">
+        <div class="meta-row">
+          <span>Depok,</span>
+          <div class="meta-dots"><input type="text" id="dateInput"></div>
+        </div>
+        <div class="customer-header">Kepada Yth.</div>
+        <div class="meta-row">
+          <span>Tuan</span>
+          <div class="meta-dots"><input type="text" id="tuanInput"></div>
+        </div>
+        <div class="meta-row">
+          <span>Toko</span>
+          <div class="meta-dots"><input type="text" id="tokoInput"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="nota-no-container">
+      <span>NOTA No.</span>
+      <div class="nota-no-line">
+        <input type="text" id="notaNumber">
+      </div>
+    </div>
+
+    <div class="tbl">
+      <div class="tbl-head">
+        <div>Banyak<br>nya</div>
+        <div>NAMA BARANG</div>
+        <div>Harga<br>Satuan</div>
+        <div>Jumlah</div>
+      </div>
+      <div id="tblBody"></div>
+    </div>
+
+    <div class="footer-container">
+      <div class="tanda-terima-box">
+        <span>Tanda Terima</span>
+        <span class="signature-line">( &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</span>
+      </div>
+      
+      <div class="right-footer-block">
+        <div class="total-row">
+          <span>Jumlah Rp.</span>
+          <div class="total-box" id="grandTotal"></div>
+        </div>
+        
+        <div class="hormat-kami-box">
+          <span>Hormat kami,</span>
+          <span class="signature-line">( &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; )</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="perhatian-box">
+      <p class="perhatian-title">PERHATIAN !!</p>
+      <p class="perhatian-text">Barang-barang yang sudah dibeli</p>
+      <p class="perhatian-text">tidak dapat ditukar / dikembalikan</p>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="qrModal">
+  <div class="modal-box">
+    <h3>Verifikasi Nota Elektronik</h3>
+    <div id="qrcode-container"></div>
+    <button class="close-btn" id="closeModal">Tutup</button>
+  </div>
+</div>
+
+<script>
+  const ROW_COUNT = 15;
+  const tblBody = document.getElementById('tblBody');
+  const grandTotalEl = document.getElementById('grandTotal');
+  
+  // Set default current date format otentik
+  const dateOpts = { day: 'numeric', month: 'long', year: 'numeric' };
+  document.getElementById('dateInput').value = new Date().toLocaleDateString('id-ID', dateOpts);
+
+  function formatPrice(num) {
+    return num > 0 ? num.toLocaleString('id-ID') : '';
+  }
+
+  function calculateRow(row) {
+    const qty = parseFloat(row.querySelector('.qty-input').value) || 0;
+    const price = parseFloat(row.querySelector('.price-input').value) || 0;
+    const total = qty * price;
+    
+    row.querySelector('.cell-jumlah').textContent = formatPrice(total);
+    row.dataset.total = total;
+    calculateGrandTotal();
+  }
+
+  function calculateGrandTotal() {
+    let sum = 0;
+    tblBody.querySelectorAll('.tbl-row').forEach(r => {
+      sum += parseFloat(r.dataset.total || 0);
+    });
+    grandTotalEl.textContent = sum > 0 ? sum.toLocaleString('id-ID') : '';
+  }
+
+  // Generate baris tabel nota secara dinamis
+  for (let i = 0; i < ROW_COUNT; i++) {
+    const row = document.createElement('div');
+    row.className = 'tbl-row';
+    row.dataset.total = 0;
+    row.innerHTML = `
+      <div class="cell-qty"><input type="number" class="qty-input"></div>
+      <div class="cell-name"><input type="text" class="name-input"></div>
+      <div class="cell-price"><input type="number" class="price-input"></div>
+      <div class="cell-jumlah"></div>
+    `;
+    
+    row.querySelector('.qty-input').addEventListener('input', () => calculateRow(row));
+    row.querySelector('.price-input').addEventListener('input', () => calculateRow(row));
+    tblBody.appendChild(row);
+  }
+
+  // Action Download PNG dengan teknik restrukturisasi teks agar rapi
+  document.getElementById('downloadBtn').addEventListener('click', async () => {
+    const target = document.getElementById('nota-frame');
+    const inputs = target.querySelectorAll('input');
+    const savedValues = [];
+
+    // Ubah sementara elemen input ke Text biasa agar hasil screenshot sempurna mirip kertas cetak asli
+    inputs.forEach(input => {
+      savedValues.push({ element: input, value: input.value });
+      const textSpan = document.createElement('span');
+      textSpan.textContent = input.value;
+      textSpan.style.fontSize = window.getComputedStyle(input).fontSize;
+      textSpan.style.color = '#000';
+      textSpan.style.paddingLeft = '4px';
+      if(input.classList.contains('qty-input')) textSpan.style.width = '100%';
+      if(input.classList.contains('qty-input')) textSpan.style.textAlign = 'center';
+      
+      input.style.display = 'none';
+      input.after(textSpan);
+    });
+
+    const canvas = await html2canvas(target, { scale: 3, backgroundColor: '#ffffff' });
+
+    // Kembalikan ke mode input interaktif semula
+    const spans = target.querySelectorAll('.tbl-row span, .meta-dots span, .nota-no-line span');
+    spans.forEach(span => span.remove());
+    savedValues.forEach(item => {
+      item.element.style.display = 'block';
+    });
+
+    const link = document.createElement('a');
+    link.download = `Nota_Sahabat_Abadi_${document.getElementById('notaNumber').value || 'Draft'}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+  });
+
+  // Fitur Tambahan QR Code Generator
+  const qrModal = document.getElementById('qrModal');
+  const qrContainer = document.getElementById('qrcode-container');
+
+  document.getElementById('qrBtn').addEventListener('click', () => {
+    const items = [];
+    tblBody.querySelectorAll('.tbl-row').forEach(row => {
+      const qty = row.querySelector('.qty-input').value;
+      const name = row.querySelector('.name-input').value;
+      if (name.trim() !== '') items.push(`${qty}x ${name}`);
+    });
+
+    const payload = {
+      toko: "Sahabat Abadi",
+      nota: document.getElementById('notaNumber').value,
+      tanggal: document.getElementById('dateInput').value,
+      total: grandTotalEl.textContent,
+      ringkasan: items.join(', ')
+    };
+
+    qrContainer.innerHTML = '';
+    new QRCode(qrContainer, {
+      text: JSON.stringify(payload),
+      width: 160,
+      height: 160,
+      colorDark: '#cc2424',
+      colorLight: '#ffffff'
+    });
+
+    qrModal.classList.add('show');
+  });
+
+  document.getElementById('closeModal').addEventListener('click', () => qrModal.classList.remove('show'));
+</script>
+</body>
+</html>
+
